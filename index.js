@@ -268,26 +268,31 @@ function buildReminderBlock(lineCount, byteCount) {
 }
 
 /**
- * Build a user-role, plugin-sourced message shaped exactly like createUserMessage:
- * id is a UUID (MessageId is an identity brand), frozen, role "user".
+ * Build a user-role, plugin-owned message shaped exactly like createUserMessage:
+ * id is a UUID (MessageId is an identity brand), source.kind is this plugin's
+ * own merge-extensible variant, and the value is frozen.
  */
 function makeMessage(text) {
   return Object.freeze({
     id: randomUUID(),
     role: "user",
     content: [{ type: "text", text }],
-    source: { kind: "plugin", plugin: name },
+    source: { kind: name },
   });
 }
 
 function apply(ctx) {
   const log = ctx.logger(name);
 
-  // Session lifecycle began, once before the first turn. Seed model-facing
-  // context via agent.inject() (documented seed point for agent/session-start).
-  // Sync fs keeps the injection inside the emit dispatch, so it cannot race the
-  // driver's first step.
-  ctx.on("agent/session-start", ({ agent }) => {
+  // Agent creation is the DSH session-start seam: it fires after factory
+  // setup, before the first turn, and the loop holds queued input until every
+  // listener settles. Seed model-facing context via agent.inject(); sync fs
+  // keeps the injection inside the serial dispatch.
+  ctx.on("agent/created", ({ agent, source }) => {
+    // A resumed session already carries the memory message from its original
+    // start, and subagents intentionally do not inherit MEMORY.md.
+    if (source === "resume" || (agent.session.header.delegationDepth ?? 0) > 0) return;
+
     const cwd = agent.session.header.cwd ?? process.cwd();
     const loaded = getMemoryContent(cwd);
 
