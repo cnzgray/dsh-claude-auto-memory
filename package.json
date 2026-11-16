@@ -11,6 +11,9 @@
     "claude-code",
     "memory"
   ],
+  "engines": {
+    "dsh": ">=0.2.0-rc.2"
+  },
   "license": "MIT",
   "publishConfig": {
     "access": "public"
