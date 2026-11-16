@@ -3,9 +3,9 @@ name: publish
 on:
   push:
     tags:
-      # 包作用域 tag：@cnzgray/<包名>@<semver>
-      #   @cnzgray/dsh-claude-auto-memory@0.1.2
-      - '@cnzgray/*@*'
+      # 版本 tag：v<semver>
+      #   v0.1.2
+      - 'v*'
   workflow_dispatch:
 
 permissions:
@@ -21,7 +21,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           registry-url: https://registry.npmjs.org/
 
       - name: Verify tag matches package version
@@ -29,8 +29,8 @@ jobs:
         run: |
           pkg_name=$(node -p "require('./package.json').name")
           pkg_version=$(node -p "require('./package.json').version")
-          if [ "${GITHUB_REF_NAME}" != "${pkg_name}@${pkg_version}" ]; then
-            echo "::error::tag ${GITHUB_REF_NAME} != ${pkg_name}@${pkg_version}"
+          if [ "${GITHUB_REF_NAME}" != "v${pkg_version}" ]; then
+            echo "::error::tag ${GITHUB_REF_NAME} != v${pkg_version}"
             exit 1
           fi
           echo "publishing ${pkg_name}@${pkg_version}"
