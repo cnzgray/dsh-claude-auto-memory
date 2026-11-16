@@ -1,0 +1,41 @@
+name: publish
+
+on:
+  push:
+    tags:
+      # 包作用域 tag：@cnzgray/<包名>@<semver>
+      #   @cnzgray/dsh-claude-auto-memory@0.1.2
+      - '@cnzgray/*@*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  # npm Trusted Publishing (OIDC)：发布时无需任何 npm token
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org/
+
+      - name: Verify tag matches package version
+        if: github.event_name == 'push'
+        run: |
+          pkg_name=$(node -p "require('./package.json').name")
+          pkg_version=$(node -p "require('./package.json').version")
+          if [ "${GITHUB_REF_NAME}" != "${pkg_name}@${pkg_version}" ]; then
+            echo "::error::tag ${GITHUB_REF_NAME} != ${pkg_name}@${pkg_version}"
+            exit 1
+          fi
+          echo "publishing ${pkg_name}@${pkg_version}"
+
+      # OIDC：npm CLI 会自动用 GitHub 身份令牌换取一次性发布凭证，
+      # 不需要 NODE_AUTH_TOKEN；--provenance 附带构建来源证明
+      - name: Publish to npm
+        run: npm publish --provenance

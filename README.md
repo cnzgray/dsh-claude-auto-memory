@@ -17,9 +17,9 @@ This package declares `dsh.bundle`, so `dsh plugin add` automatically adds it to
 # From npm (after publishing)
 dsh plugin --profile web add @cnzgray/dsh-claude-auto-memory
 
-# Or from a local path / git repo (monorepo subdir) / tarball
+# Or from a local path / git repo / tarball
 dsh plugin --profile web add ./packages/claude-auto-memory
-dsh plugin --profile web add github:cnzgray/dsh-plugins/packages/claude-auto-memory
+dsh plugin --profile web add github:cnzgray/dsh-claude-auto-memory
 
 # Verify the assembled tree without starting
 dsh --profile web --dump-config | grep -A3 claude-auto-memory

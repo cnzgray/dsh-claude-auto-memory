@@ -17,9 +17,9 @@
 # 从 npm 安装（发布后）
 dsh plugin --profile web add @cnzgray/dsh-claude-auto-memory
 
-# 或从本地路径 / git 仓库（monorepo 子目录）/ tarball 安装
+# 或从本地路径 / git 仓库 / tarball 安装
 dsh plugin --profile web add ./packages/claude-auto-memory
-dsh plugin --profile web add github:cnzgray/dsh-plugins/packages/claude-auto-memory
+dsh plugin --profile web add github:cnzgray/dsh-claude-auto-memory
 
 # 校验装配后的树（不启动）
 dsh --profile web --dump-config | grep -A3 claude-auto-memory
